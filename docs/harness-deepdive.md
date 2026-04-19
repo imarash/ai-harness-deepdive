@@ -5,6 +5,8 @@ This page steps past the *skills* surface and looks at the **harness** underneat
 Skills are the *file format these harnesses agree on*. The harness is everything else — and that's where the real engineering lives.
 
 > If you're new here: start with [`internals-overview.md`](./internals-overview.md) for the high-level architectural patterns, then come back here for depth. Per-agent harness details live in each agent's own page (`docs/agents/<agent>.md` → "Harness Deep Dive" section).
+>
+> **Source-level reference for one of the 45**: Liu, Zhao, Shang & Shen (2026), *Dive into Claude Code: The Design Space of Today's and Future AI Agent Systems* — [arXiv:2604.14228](https://arxiv.org/abs/2604.14228). A reverse-engineering analysis of Claude Code v2.1.88 with OpenClaw used as the structural counterpoint. Where this page describes a pattern that one of those two agents implements, the in-repo paper note ([`docs/papers/dive-into-claude-code.md`](./papers/dive-into-claude-code.md)) gives the source-cited counts (7 permission modes, 5-layer compaction pipeline, 27 hook events, 54-tool ceiling, etc.). The paper also identifies **three cross-cutting design commitments** that recur in this taxonomy: *graduated layering over monolithic mechanisms*, *append-only durable state favoring auditability over query power*, and *model judgment within a deterministic harness* (the "1.6% decision logic / 98.4% operational harness" framing).
 
 ---
 

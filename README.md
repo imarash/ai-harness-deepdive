@@ -39,6 +39,7 @@ The answer requires walking through every entry in the matrix. That's what the [
 | [`docs/feature-compatibility.md`](./docs/feature-compatibility.md) | Annotated feature matrix (`allowed-tools`, `context: fork`, hooks) |
 | [`docs/skill-format.md`](./docs/skill-format.md) | Authoring guide — `SKILL.md` frontmatter, discovery, plugin manifests |
 | [`docs/analysis.md`](./docs/analysis.md) | Cross-cutting findings, path conventions, vendor strategy patterns |
+| [`docs/papers/`](./docs/papers/) | Notes on **external research** that updates this report — currently: Liu et al. 2026, *Dive into Claude Code* ([arXiv:2604.14228](https://arxiv.org/abs/2604.14228)) |
 
 ### Decision support
 
@@ -86,7 +87,7 @@ The answer requires walking through every entry in the matrix. That's what the [
 | 28 | Mistral Vibe | Mistral AI | CLI + IDE ext. | [mistral-vibe.md](./docs/agents/mistral-vibe.md) |
 | 29 | Mux | Coder | CLI | [mux.md](./docs/agents/mux.md) |
 | 30 | Neovate | Neovate AI | CLI + Web + Desktop | [neovate.md](./docs/agents/neovate.md) |
-| 31 | OpenClaw | OpenClaw | Native IDE | [openclaw.md](./docs/agents/openclaw.md) |
+| 31 | OpenClaw | OpenClaw | WS gateway daemon + companion apps | [openclaw.md](./docs/agents/openclaw.md) |
 | 32 | OpenCode | sst | CLI | [opencode.md](./docs/agents/opencode.md) |
 | 33 | OpenHands | All-Hands AI | Web + CLI | [openhands.md](./docs/agents/openhands.md) |
 | 34 | Pi | badlogic | CLI | [pi.md](./docs/agents/pi.md) |
@@ -111,6 +112,7 @@ All facts in this repository were derived from:
 - The [`vercel-labs/skills`](https://github.com/vercel-labs/skills) repository (`README.md`, `AGENTS.md`, `src/agents.ts`).
 - Each agent's own official documentation (linked from each per-agent page).
 - The shared [Agent Skills specification](https://agentskills.io) and the [skills.sh](https://skills.sh) directory.
+- External research where it offers source-grounded specifics that vendor docs don't publish — most notably Liu, Zhao, Shang & Shen (2026), *Dive into Claude Code: The Design Space of Today's and Future AI Agent Systems* ([arXiv:2604.14228](https://arxiv.org/abs/2604.14228)). See [`docs/papers/dive-into-claude-code.md`](./docs/papers/dive-into-claude-code.md) for what it adds and where it lands in the per-agent pages.
 
 If a vendor changes a path or feature flag upstream, the corresponding agent page should be updated.
 

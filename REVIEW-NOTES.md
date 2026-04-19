@@ -141,3 +141,51 @@ The following 36 agents were not pulled in this review (either their vendor page
 - Revisit [docs/harness-deepdive.md](docs/harness-deepdive.md) to move **plan mode**, **memory primitives**, and **sub-agent invocation** out of the "innovation" tier and into the baseline description for CLI-native agents.
 - Pick one of the un-sampled high-profile agents (Windsurf, Amp, Continue, Aider) for the next audit pass — their vendor sites returned 403 to this run but have public GitHub mirrors or blog feeds that can be used instead.
 
+---
+
+## External-research integration — *Dive into Claude Code* (April 18, 2026)
+
+**Paper**: Liu, J., Zhao, X., Shang, X., & Shen, Z. (2026). *Dive into Claude Code: The Design Space of Today's and Future AI Agent Systems*. [arXiv:2604.14228](https://arxiv.org/abs/2604.14228) (cs.SE, submitted April 14, 2026). VILA Lab @ MBZUAI + UCL. Source-level reverse-engineering of Claude Code v2.1.88 (≈1,884 TS files, ≈512K LOC), with OpenClaw used as a structural counterpoint.
+
+The paper is the most authoritative public reference for Claude Code's harness internals as of April 2026 and — usefully for *this* repo — it analyzes one of our other agents (OpenClaw) in the same study.
+
+### What it adds (Tier B = source-cited)
+
+| Subsystem | Paper's count / detail | Source files |
+| --- | --- | --- |
+| Decision logic vs. operational harness | **≈1.6% / 98.4%** | community analysis, paper §11.1 |
+| Permission modes | **7** (`plan`, `default`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`, internal `bubble`) | `permissions.ts`, `types/permissions.ts` |
+| Independent safety layers | **7** stages | `tools.ts`, `permissions.ts`, `shouldUseSandbox.ts`, `conversationRecovery.ts`, `types/hooks.ts` |
+| Pre-model context shapers | **5** (`budget reduction → snip → microcompact → context collapse → auto-compact`), feature-flag gated | `query.ts:365–453`, `compact.ts` |
+| Hook events | **27** total, **15** with rich schemas, **5** in the permission flow; command types `command` / `prompt` / `http` / `agent` (+ runtime `callback`) | `coreTypes.ts`, `coreSchemas.ts`, `types/hooks.ts`, `schemas/hooks.ts` |
+| Built-in tool count | up to **54** (19 always-on + 35 conditional); **3** in `CLAUDE_CODE_SIMPLE` mode | `tools.ts` |
+| Plugin component types | **10** | `utils/plugins/schemas.ts` |
+| Subagent built-in types | up to **6** | `AgentTool.tsx`, `runAgent.ts` (21 params) |
+| Subagent isolation modes | **3** (`worktree` / `remote` (internal) / in-process) | `AgentTool.tsx` |
+| MCP transports | **stdio / SSE / HTTP / WebSocket / SDK / sse-ide / ws-ide / claudeai-proxy** | `services/mcp/client.ts` |
+| Sandboxing's effect on prompts | **≈84% reduction** (Anthropic data, cited in paper §11.3) | `anthropic2025sandboxing` |
+
+### Files changed in this integration pass
+
+| File | Nature of change |
+| --- | --- |
+| [`docs/papers/dive-into-claude-code.md`](./docs/papers/dive-into-claude-code.md) | **New.** Full paper note: 5 values + 13 principles, source-grounded inventory, OpenClaw contrast across 6 dimensions, 6 open design directions, methodology caveats. Authoritative landing page for the citation. |
+| [`docs/agents/claude-code.md`](./docs/agents/claude-code.md) | Internals section now cites the 1.6% / 98.4% ratio and one-loop / multiple-surfaces design. Harness Deep Dive rewritten with paper-grounded counts: `queryLoop()` with 7 continue points, `StreamingToolExecutor` + sibling-abort, 5-layer compaction pipeline (with feature-flag names), 4-tier `CLAUDE.md` hierarchy with `@include`, 7-mode permission system, 7-layer permission pipeline, 27 hook events, 54 tool ceiling, 6 built-in subagent types, 3 isolation modes, sidechain transcripts, append-only JSONL session storage, file-history vs generic-checkpoint clarification. Documentation list adds the paper. |
+| [`docs/agents/openclaw.md`](./docs/agents/openclaw.md) | **Major recharacterisation** — surface flipped from `Native AI IDE` to `Local-first WebSocket gateway daemon + macOS / iOS / Android companion apps`. Adds: gateway-centric architecture (loopback port 18789), Pi-agent runner inside RPC dispatch, ~24 messaging surfaces, 12 plugin capability types, workspace bootstrap files (AGENTS.md / SOUL.md / TOOLS.md / IDENTITY.md / USER.md, conditionally BOOTSTRAP.md / HEARTBEAT.md / MEMORY.md), separate memory subsystem (`MEMORY.md` + daily notes + optional `DREAMS.md`), hybrid vector+keyword search, **dreaming** background memory promotion, sub-agent depth limits (max 5 / default 1), opt-in sandboxing (Docker / SSH / OpenShell), perimeter trust model (DM pairing, allowlists, gateway auth), and **ACP integration** that lets OpenClaw host Claude Code / Codex / Gemini CLI as agent personas. Mermaid diagram redrawn around the gateway. Existing 6-layer skill loader content retained — it matched the paper. |
+| [`README.md`](./README.md) | OpenClaw row updated (`Native IDE` → `WS gateway daemon + companion apps`); `docs/papers/` added to documentation map; *Source data* section explicitly cites the paper. |
+| [`docs/harness-deepdive.md`](./docs/harness-deepdive.md) | Reading-list / cross-reference link to the paper note. |
+| [`REVIEW-NOTES.md`](./REVIEW-NOTES.md) | This entry. |
+
+### Caveats specific to this integration
+
+1. **The paper is itself a static-snapshot, reverse-engineered analysis** of v2.1.88 (paper §16.1, §16.3). Several subsystems it counts (auto-mode classifier, context collapse, microcompact cache-aware path, BashTool speculative classifier, KAIROS proactive agent) are **feature-flag-gated** — `TRANSCRIPT_CLASSIFIER`, `CONTEXT_COLLAPSE`, `CACHED_MICROCOMPACT`, `BASH_CLASSIFIER`, `KAIROS`, `REACTIVE_COMPACT`, `HISTORY_SNIP`, `BREAK_CACHE_COMMAND`. Different shipping builds may have functionally different applications. Counts in this repo's per-agent page are valid for the v2.1.88 snapshot with cited flags active, not for *every* shipping Claude Code build. The README's earlier "Recent changes" snapshot already notes that v2.1.113 / 2.1.114 are now the rolling stable channel — the paper's static analysis lags by ~25 minor versions, but the architectural claims (subsystem inventory, design principles, source-file boundaries) are durable.
+2. **The OpenClaw recharacterisation is a *substantial* correction**, not a minor one. The previous page treated OpenClaw as an AgentSkills-compatible IDE. Liu et al.'s description (gateway daemon, messaging surfaces, ACP-hosted external harnesses, dreaming memory subsystem) is fundamentally different. The 6-layer skill loader and ClawHub registry were already accurate and were retained; the surface, agent-runtime topology, trust model, multi-agent architecture, and innovation summary were rewritten. If a future review finds that OpenClaw shipped *both* an IDE surface and a gateway daemon, the page may need to acknowledge both.
+3. **Two of the paper's most empirically loaded claims are not from primary OpenClaw / Claude Code code** — the 93% permission-approval rate, the auto-approve trajectory from ~20% to >40%, and the 7× plan-mode token cost — are from Anthropic's own internal reports cited within the paper (`anthropic2026automode`, `anthropic2026autonomy`, `anthropic2025agentteams`). They are reproduced in the per-agent page as paper-cited; downstream consumers should treat them as Anthropic-published, not paper-derived.
+4. **Long-term capability concerns** (Becker 2025; Shen 2026; Kosmyna 2025; He 2026; Liu 2026 tech-debt; Rak 2025 hiring) are summarised in the paper note's preamble but **not pushed into per-agent pages** — they apply across every bounded-context tool-use agent, not specifically to Claude Code, and don't change the architectural picture.
+
+### Follow-up items now open
+
+- The paper identifies **six open design directions** (observability vs. evaluation, cross-session persistence, harness boundary evolution, horizon scaling, governance, long-term capability) that line up cleanly with the cross-cutting `harness-deepdive.md` taxonomy. A future pass could promote those into a dedicated *Open Directions* section in `harness-deepdive.md`.
+- The paper's three "recurring design choices" (graduated layering / append-only auditability / model judgment within deterministic harness) generalize beyond Claude Code. The `internals-overview.md` *Pattern* sections could fold them in as cross-pattern observations.
+- KAIROS (the feature-gated proactive background agent the paper mentions in §11.6) is not yet in the agent table because it is not user-facing today, but if it ships generally available it would be worth a per-agent entry.
+
