@@ -63,6 +63,7 @@ This is the canonical reference for **where the `npx skills` CLI installs a skil
 ### Project paths
 
 - **`.agents/skills/`** is shared by 15 agents. This is the de-facto "shared bucket" path. If you only target this one path, you cover Amp, Antigravity, Cline, Codex, Cursor, Deep Agents, Firebender, Gemini CLI, GitHub Copilot, Kimi CLI, OpenCode, Replit, Universal, and Warp.
+- **GitHub Copilot** — the table above lists where `npx skills` *installs* for `--agent github-copilot` (still `.agents/skills/`). GitHub's own documentation additionally lists **`.github/skills/`** and **`.claude/skills/`** as project discovery paths Copilot will load — see [About agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills). Same idea for globals: Copilot reads `~/.copilot/skills/` but also `~/.agents/skills/` and `~/.claude/skills/`.
 - **`skills/`** (no leading dot) is unique to OpenClaw. This will be picked up by *any* tool that does a recursive search of the project.
 - **`.factory/skills/`** is Droid's path — note that the slug is `droid` but the folder is `.factory`. Factory AI is the company; Droid is the product.
 - **`.vibe/skills/`** is Mistral Vibe — short folder name, not `.mistral-vibe`.

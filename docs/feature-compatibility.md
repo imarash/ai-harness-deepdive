@@ -68,6 +68,8 @@ This is what makes Claude Code the de-facto reference implementation: the spec i
 
 In Cline, hooks are limited to pre/post-tool execution but can be triggered from inside a skill.
 
+**Do not confuse this with GitHub Copilot “agent hooks”:** Copilot cloud agent and Copilot CLI support workflow hooks configured as `.github/hooks/*.json` ([about hooks](https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-hooks)). That mechanism is separate from the Agent Skills matrix above.
+
 ---
 
 ## What about the other 27 agents?

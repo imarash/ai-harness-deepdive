@@ -14,7 +14,7 @@ Pre-skills, every agent had its own way of giving the model "team conventions":
 | --- | --- |
 | Cursor | `.cursor/rules/*.mdc` |
 | Claude Code | `CLAUDE.md` at project root |
-| GitHub Copilot | `.github/copilot-instructions.md` |
+| GitHub Copilot | `.github/copilot-instructions.md`, path-scoped `.github/instructions/*.instructions.md`, and `AGENTS.md` (plus other agent-instruction filenames on some surfaces) |
 | Continue | `.continue/config.yaml` |
 | Cline | `.clinerules/*.md` |
 | Windsurf | `.windsurfrules` (later `.windsurf/rules/`) |
